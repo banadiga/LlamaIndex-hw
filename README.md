@@ -22,14 +22,23 @@ The repository contains a straightforward web application that lists candidates.
 any candidate to view detailed information and a summary of their profile.
 
 
-# PostgreSQL
+# One script
+To run HW as one script use [start.sh](start.sh)
+
+```bash
+sh start.sh
+```
+
+# Step by step
+
+## PostgreSQL
 Use docker compose to start up *PostgreSQL* as a vector store.
 
 ```bash
 docker-compose up
 ```
 
-# python env
+## python env
 
 Create python virtual env
 
@@ -47,7 +56,7 @@ install dependency and recreate scripts
 pip install .
 ```
 
-# Download 
+## Download 
 To download CV files from
 https://www.kaggle.com/datasets/snehaanbhawal/resume-dataset
 
@@ -60,7 +69,7 @@ or
 lhw download --sample 30
 ```
 
-# Convert PDF to TXT
+## Convert PDF to TXT
 
 ```bash
 lhw pdf2txt
