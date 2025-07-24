@@ -28,3 +28,35 @@ Use docker compose to start up *PostgreSQL* as a vector store.
 ```bash
 docker-compose up
 ```
+
+# python env
+
+Create python virtual env
+
+```bash
+python3 -m venv .venv
+```
+
+activate it
+```bash
+source .venv/bin/activate
+```
+
+install dependency and recreate scripts
+```bash
+pip install .
+```
+
+# Download 
+To download CV files from
+https://www.kaggle.com/datasets/snehaanbhawal/resume-dataset
+
+```bash
+download-resumes --sample 30
+```
+
+or
+```bash
+lhw download --sample 30
+```
+

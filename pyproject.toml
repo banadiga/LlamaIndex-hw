@@ -1,0 +1,42 @@
+# pyproject.toml
+# ------------------------------------------------------------
+# Core metadata & deps (PEP 621)
+# ------------------------------------------------------------
+[project]
+name = "llamaindex-hw"
+version = "0.1.0"
+description = "HW"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Ihor Banadiga" }
+]
+license = { text = "MIT" }
+
+dependencies = [
+  "kagglehub>=0.2.5",
+  "pandas>=2.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.4",
+  "pytest>=8",
+  "mypy>=1.10",
+  "build>=1.2",
+  "twine>=5.0"
+]
+
+[project.scripts]
+lhw = "lhw.cli:main"
+download-resumes = "lhw.cli:download"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
