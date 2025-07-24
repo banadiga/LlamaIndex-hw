@@ -60,3 +60,8 @@ or
 lhw download --sample 30
 ```
 
+# Convert PDF to TXT
+
+```bash
+lhw pdf2txt
+```

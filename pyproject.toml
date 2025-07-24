@@ -15,7 +15,9 @@ license = { text = "MIT" }
 
 dependencies = [
   "kagglehub>=0.2.5",
-  "pandas>=2.0"
+  "pandas>=2.0",
+  "llama-index>=0.10.0",
+  "pypdf"
 ]
 
 [project.optional-dependencies]
