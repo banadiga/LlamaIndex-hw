@@ -6,11 +6,11 @@ This involves reading CV files from
 This involves reading CV files from https://www.kaggle.com/datasets/snehaanbhawal/resume-dataset 
 You can choose up to 20-30 CVs.
 - [x] Split CV into small meaningful chunks.
-- [ ] Generating Embeddings: Convert the parsed data into numerical representations (embeddings) that can be easily 
+- [x] Generating Embeddings: Convert the parsed data into numerical representations (embeddings) that can be easily 
 processed by machine learning algorithms. This typically involves using techniques like word embeddings or sentence 
 embeddings.
-- [ ] Storing Embeddings in a Vector Database: Save the generated embeddings into a vector database. As a vector store, 
-you can choose **PostgreSQL**, ChromaDB, FAISS, etc,
+- [x] Storing Embeddings in a Vector Database: Save the generated embeddings into a vector database. As a vector store, 
+you can choose **PostgreSQL**~~, ChromaDB, FAISS, etc,~~
 - [ ] Retrieving Candidate Details: Extract and display specific information about each  candidate, such as name, 
 profession, and years of commercial experience.
 - [ ] Generating Experience Summary: Based on the parsed data and embeddings, generate a summary of each candidate’s 
@@ -76,4 +76,10 @@ lhw pdf2txt
 
 ```bash
 lhw chunks --debug True
+```
+
+## Embeddings
+
+```bash
+lhw embeddings
 ```

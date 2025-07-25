@@ -17,6 +17,8 @@ dependencies = [
   "kagglehub>=0.2.5",
   "pandas>=2.0",
   "llama-index>=0.10.0",
+  "pgvector>=0.2.5",
+  "psycopg[binary]>=3.1.18",
   "pypdf"
 ]
 

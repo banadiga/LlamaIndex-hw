@@ -6,10 +6,19 @@ import random
 import kagglehub
 import argparse
 import shutil
+import psycopg
+import os
+
 from pathlib import Path
 
 from llama_index.readers.file import PDFReader
 from llama_index.core.node_parser import SentenceSplitter
+from llama_index.embeddings.openai import OpenAIEmbedding
+from pgvector.psycopg import register_vector
+from psycopg.rows import dict_row
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DATASET = "snehaanbhawal/resume-dataset"
 DATA = "data"
@@ -71,6 +80,39 @@ def _chunks_impl(chunk_size: int, chunk_overlap: int, paragraph_separator: str, 
                 (SAMPLE_DIR / f"{txt.stem}_chunk_{i:03d}.txt").write_text(ch, encoding="utf-8")
 
 
+def _embeddings_impl() -> None:
+    """Embeddings"""
+    embedder = OpenAIEmbedding(model="text-embedding-3-small")
+
+    POSTGRES_USER = os.getenv("POSTGRES_USER", "")
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "")
+    POSTGRES_DB = os.getenv("POSTGRES_DB", "embeddings")
+    POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+    POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+
+    DSN = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+
+    with psycopg.connect(DSN, row_factory=dict_row) as conn:
+        register_vector(conn)  # teach psycopg how to send/receive vector
+        with conn.cursor() as cur:
+            for txt in SAMPLE_DIR.glob("*_chunk_*.txt"):
+                cv_text = open(txt, encoding="utf-8").read()
+                embedding = embedder.get_text_embedding(cv_text)
+                chunk_no = int(txt.stem.split("_chunk_")[-1])
+                print(f"{txt.name} [OK]")
+                cur.execute(
+                    """
+                    INSERT INTO cv_chunks (file_name, chunk_no, content, embedding)
+                    VALUES (%s, %s, %s, %s) ON CONFLICT (file_name, chunk_no)
+                                    DO
+                    UPDATE SET content = EXCLUDED.content,
+                        embedding = EXCLUDED.embedding,
+                        created_at = now();
+                    """,
+                    (txt.name, chunk_no, cv_text, embedding),
+                )
+        conn.commit()
+
 def _cmd_download(args: argparse.Namespace) -> int:
     _download_impl(sample=args.sample)
     return 0
@@ -82,8 +124,15 @@ def _cmd_pdf2txt(args: argparse.Namespace) -> int:
 
 
 def _cmd_chunks(args: argparse.Namespace) -> int:
-    _chunks_impl(chunk_size=args.chunk_size, chunk_overlap=args.chunk_overlap, paragraph_separator=args.paragraph_separator, debug=args.debug)
+    _chunks_impl(chunk_size=args.chunk_size, chunk_overlap=args.chunk_overlap,
+                 paragraph_separator=args.paragraph_separator, debug=args.debug)
     return 0
+
+
+def _cmd_embeddings(args: argparse.Namespace) -> int:
+    _embeddings_impl()
+    return 0
+
 
 def main(argv: list[str] | None = None) -> int:
     """Entry point for the multi-command CLI (lhw)."""
@@ -101,12 +150,15 @@ def main(argv: list[str] | None = None) -> int:
 
     # --- chunks subcommand ---
     p_chunks = sub.add_parser("chunks", help="Sentence splitter")
-    # chunk_size: int, chunk_overlap: int, paragraph_separator: str, debug:
     p_chunks.add_argument("--chunk_size", type=int, default=512, help="Size of chunks")
     p_chunks.add_argument("--chunk_overlap", type=int, default=64, help="Overlap of chunks")
     p_chunks.add_argument("--paragraph_separator", type=str, default="\n\n", help="Separator between paragraphs")
     p_chunks.add_argument("--debug", type=bool, default=False, help="Debug mode")
     p_chunks.set_defaults(func=_cmd_chunks)
+
+    # --- embeddings subcommand ---
+    p_embeddings = sub.add_parser("embeddings", help="embeddings")
+    p_embeddings.set_defaults(func=_cmd_embeddings)
 
     args = parser.parse_args(argv)
     return args.func(args)
