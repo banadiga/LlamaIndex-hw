@@ -31,7 +31,6 @@ dev = [
 
 [project.scripts]
 lhw = "lhw.cli:main"
-download-resumes = "lhw.cli:download"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

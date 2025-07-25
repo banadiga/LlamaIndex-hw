@@ -9,17 +9,19 @@ import shutil
 from pathlib import Path
 
 from llama_index.readers.file import PDFReader
+from llama_index.core.node_parser import SentenceSplitter
 
 DATASET = "snehaanbhawal/resume-dataset"
 DATA = "data"
 SAMPLE_DIR = Path(DATA) / "sample"
 
+
 def _download_impl(sample: int) -> None:
     """Your real download logic lives here so it's testable."""
     # Load the latest version
-    download_path =  Path(
+    download_path = Path(
         kagglehub.dataset_download(
-        "snehaanbhawal/resume-dataset",
+            "snehaanbhawal/resume-dataset",
         )
     )
 
@@ -51,23 +53,37 @@ def _pdf2txt_impl() -> None:
         (SAMPLE_DIR / f"{pdf.stem}.txt").write_text(text, encoding="utf-8")
         print(f"{pdf.name} -> {pdf.stem}.txt [OK]")
 
+
+def _chunks_impl(chunk_size: int, chunk_overlap: int, paragraph_separator: str, debug: bool) -> None:
+    """Sentence splitter."""
+    splitter = SentenceSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        paragraph_separator=paragraph_separator,
+    )
+    for txt in SAMPLE_DIR.glob("*.txt"):
+        cv_text = open(txt, encoding="utf-8").read()
+        chunks = splitter.split_text(cv_text)
+        print(f"{txt.name} -> {len(chunks)} [OK]")
+        if debug:
+            # write one file per chunk
+            for i, ch in enumerate(chunks, 1):
+                (SAMPLE_DIR / f"{txt.stem}_chunk_{i:03d}.txt").write_text(ch, encoding="utf-8")
+
+
 def _cmd_download(args: argparse.Namespace) -> int:
     _download_impl(sample=args.sample)
     return 0
+
 
 def _cmd_pdf2txt(args: argparse.Namespace) -> int:
     _pdf2txt_impl()
     return 0
 
 
-def download() -> int:
-    """
-    Entry point for downloading resumes dataset.
-    """
-    parser = argparse.ArgumentParser(prog="download-resumes", description="Download resumes dataset")
-    parser.add_argument("--sample", type=int, default=40)
-    args = parser.parse_args()
-    return _cmd_download(args)
+def _cmd_chunks(args: argparse.Namespace) -> int:
+    _chunks_impl(chunk_size=args.chunk_size, chunk_overlap=args.chunk_overlap, paragraph_separator=args.paragraph_separator, debug=args.debug)
+    return 0
 
 def main(argv: list[str] | None = None) -> int:
     """Entry point for the multi-command CLI (lhw)."""
@@ -76,15 +92,25 @@ def main(argv: list[str] | None = None) -> int:
 
     # --- download subcommand ---
     p_dl = sub.add_parser("download", help="Download resumes dataset")
-    p_dl.add_argument("--sample", type=int, default=50, help="How many items to download (demo)")
+    p_dl.add_argument("--sample", type=int, default=50, help="How many items to download")
     p_dl.set_defaults(func=_cmd_download)
 
     # --- download subcommand ---
     p_p2t = sub.add_parser("pdf2txt", help="PDF to text conversion")
     p_p2t.set_defaults(func=_cmd_pdf2txt)
 
+    # --- chunks subcommand ---
+    p_chunks = sub.add_parser("chunks", help="Sentence splitter")
+    # chunk_size: int, chunk_overlap: int, paragraph_separator: str, debug:
+    p_chunks.add_argument("--chunk_size", type=int, default=512, help="Size of chunks")
+    p_chunks.add_argument("--chunk_overlap", type=int, default=64, help="Overlap of chunks")
+    p_chunks.add_argument("--paragraph_separator", type=str, default="\n\n", help="Separator between paragraphs")
+    p_chunks.add_argument("--debug", type=bool, default=False, help="Debug mode")
+    p_chunks.set_defaults(func=_cmd_chunks)
+
     args = parser.parse_args(argv)
     return args.func(args)
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
