@@ -25,9 +25,6 @@ def _download_impl(sample: int) -> None:
 
     print(f"Downloaded to: {download_path}")
 
-    # delete and recreate
-    if SAMPLE_DIR.exists():
-        shutil.rmtree(SAMPLE_DIR)
     SAMPLE_DIR.mkdir(parents=True)
 
     # save samples
