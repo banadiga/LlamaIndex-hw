@@ -11,6 +11,8 @@ processed by machine learning algorithms. This typically involves using techniqu
 embeddings.
 - [x] Storing Embeddings in a Vector Database: Save the generated embeddings into a vector database. As a vector store, 
 you can choose **PostgreSQL**~~, ChromaDB, FAISS, etc,~~
+- [x] Storing Embeddings in a Vector Database: Save the generated embeddings into a vector database. As a vector store, 
+you can choose **PostgreSQL** with llama index.
 - [ ] Retrieving Candidate Details: Extract and display specific information about each  candidate, such as name, 
 profession, and years of commercial experience.
 - [ ] Generating Experience Summary: Based on the parsed data and embeddings, generate a summary of each candidate’s 
@@ -84,7 +86,7 @@ lhw chunks --debug True
 lhw embeddings
 ```
 
-## Create llama-index  
+## Create llama-index
 
 ```bash
 lhw llama-index

@@ -15,6 +15,7 @@ from llama_index.readers.file import PDFReader
 from llama_index.core import VectorStoreIndex, Settings, StorageContext, SimpleDirectoryReader
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.vector_stores.postgres import PGVectorStore
 from pgvector.psycopg import register_vector
 from psycopg.rows import dict_row
 from dotenv import load_dotenv
@@ -127,8 +128,19 @@ def _llamaindex_impl() -> None:
 
     Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 
+    vector_store = PGVectorStore.from_params(
+        database=os.environ["POSTGRES_DB"],
+        host="localhost",
+        port=5432,
+        user=os.environ["POSTGRES_USER"],
+        password=os.environ["POSTGRES_PASSWORD"],
+        table_name="lhw_index"
+    )
+    storage_context = StorageContext.from_defaults(vector_store=vector_store)
+
     index = VectorStoreIndex.from_documents(
         documents,
+        storage_context=storage_context,
         transformations=[SentenceSplitter(chunk_size=512, chunk_overlap=64)],
         show_progress=True,
     )
