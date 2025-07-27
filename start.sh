@@ -10,4 +10,5 @@ echo "Download 30 pdf" && lhw download --sample 30 && \
 echo "Convert 30 pdf to text" && lhw pdf2txt && \
 echo "Create chunks" && lhw chunks --debug True && \
 echo "Embeddings" && lhw embeddings && \
+echo "llama-index" && lhw llama-index && \
 echo "Done"

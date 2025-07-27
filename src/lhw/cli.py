@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 
 from llama_index.readers.file import PDFReader
+from llama_index.core import VectorStoreIndex, Settings, StorageContext, SimpleDirectoryReader
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.embeddings.openai import OpenAIEmbedding
 from pgvector.psycopg import register_vector
@@ -23,7 +24,7 @@ load_dotenv()
 DATASET = "snehaanbhawal/resume-dataset"
 DATA = "data"
 SAMPLE_DIR = Path(DATA) / "sample"
-
+PERSIST_DIR = Path(DATA) / "lhw-index"
 
 def _download_impl(sample: int) -> None:
     """Your real download logic lives here so it's testable."""
@@ -113,6 +114,29 @@ def _embeddings_impl() -> None:
                 )
         conn.commit()
 
+
+def _llamaindex_impl() -> None:
+    reader = SimpleDirectoryReader(
+        input_dir=SAMPLE_DIR,
+        required_exts=[".pdf"],
+        recursive=False,
+        filename_as_id=True,
+    )
+    documents = reader.load_data()
+    print(f"Loaded {len(documents)} PDFs from {Path(SAMPLE_DIR).resolve()}")
+
+    Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+
+    index = VectorStoreIndex.from_documents(
+        documents,
+        transformations=[SentenceSplitter(chunk_size=512, chunk_overlap=64)],
+        show_progress=True,
+    )
+
+    index.storage_context.persist(persist_dir=PERSIST_DIR)
+    print(f"Index created and persisted to ./{PERSIST_DIR}")
+
+
 def _cmd_download(args: argparse.Namespace) -> int:
     _download_impl(sample=args.sample)
     return 0
@@ -131,6 +155,11 @@ def _cmd_chunks(args: argparse.Namespace) -> int:
 
 def _cmd_embeddings(args: argparse.Namespace) -> int:
     _embeddings_impl()
+    return 0
+
+
+def _cmd_llamaindex(args: argparse.Namespace) -> int:
+    _llamaindex_impl()
     return 0
 
 
@@ -159,6 +188,10 @@ def main(argv: list[str] | None = None) -> int:
     # --- embeddings subcommand ---
     p_embeddings = sub.add_parser("embeddings", help="embeddings")
     p_embeddings.set_defaults(func=_cmd_embeddings)
+
+    # --- embeddings subcommand ---
+    p_llamaindex = sub.add_parser("llama-index", help="Create llama-index")
+    p_llamaindex.set_defaults(func=_cmd_llamaindex)
 
     args = parser.parse_args(argv)
     return args.func(args)

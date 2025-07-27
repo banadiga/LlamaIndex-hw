@@ -83,3 +83,9 @@ lhw chunks --debug True
 ```bash
 lhw embeddings
 ```
+
+## Create llama-index  
+
+```bash
+lhw llama-index
+```
