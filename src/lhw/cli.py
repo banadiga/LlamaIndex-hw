@@ -199,7 +199,7 @@ def _llamauserinfo_impl() -> None:
         port="5432",
         user=os.environ["POSTGRES_USER"],
         password=os.environ["POSTGRES_PASSWORD"],
-        table_name="data_lhw_index"
+        table_name="lhw_index"
     )
 
     engine = create_engine(vector_store.connection_string)
@@ -324,7 +324,7 @@ def _llamafullinfo_impl() -> None:
         port="5432",
         user=os.environ["POSTGRES_USER"],
         password=os.environ["POSTGRES_PASSWORD"],
-        table_name="data_lhw_index"
+        table_name="lhw_index"
     )
 
     engine = create_engine(vector_store.connection_string)
