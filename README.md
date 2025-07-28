@@ -13,11 +13,10 @@ embeddings.
 you can choose **PostgreSQL**~~, ChromaDB, FAISS, etc,~~
 - [x] Storing Embeddings in a Vector Database: Save the generated embeddings into a vector database. As a vector store, 
 you can choose **PostgreSQL** with llama index.
-- [ ] Retrieving Candidate Details: Extract and display specific information about each  candidate, such as name, 
+- [x] Retrieving Candidate Details: Extract and display specific information about each  candidate, such as name, 
 profession, and years of commercial experience.
 - [ ] Generating Experience Summary: Based on the parsed data and embeddings, generate a summary of each candidate’s 
 strongest skills and professional highlights.
-
 Important note:
 The task should be done using LlamaIndex.
 
@@ -90,4 +89,12 @@ lhw embeddings
 
 ```bash
 lhw llama-index
+```
+
+## Create llama-group-info
+Retrieving Candidate Details: Extract and display specific information about each  candidate, such as name, 
+profession, and years of commercial experience.
+
+```bash
+lhw llama-group-info
 ```
