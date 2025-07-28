@@ -15,7 +15,7 @@ you can choose **PostgreSQL**~~, ChromaDB, FAISS, etc,~~
 you can choose **PostgreSQL** with llama index.
 - [x] Retrieving Candidate Details: Extract and display specific information about each  candidate, such as name, 
 profession, and years of commercial experience.
-- [ ] Generating Experience Summary: Based on the parsed data and embeddings, generate a summary of each candidate’s 
+- [x] Generating Experience Summary: Based on the parsed data and embeddings, generate a summary of each candidate’s 
 strongest skills and professional highlights.
 Important note:
 The task should be done using LlamaIndex.
